@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マリジム｜面談完全設計書</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0E0E0E;
+  --dark: #181818;
+  --card: #1E1E1E;
+  --card2: #242424;
+  --gold: #C8A84B;
+  --gold2: #E8CC7C;
+  --gold-pale: rgba(200,168,75,0.1);
+  --gold-border: rgba(200,168,75,0.25);
+  --white: #F5F2EC;
+  --muted: #888;
+  --border: #2A2A2A;
+  --phase1: #C8A84B;
+  --phase2: #4B8EC8;
+  --phase3: #4BC87A;
+  --phase4: #C84B6A;
+  --phase5: #9B4BC8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--black); color: var(--white); font-size: 13.5px; line-height: 1.85; }
+
+/* HEADER */
+.header { padding: 52px 48px 44px; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+.header::before { content:''; position:absolute; top:-60px; right:-60px; width:320px; height:320px; background:radial-gradient(circle,rgba(200,168,75,.12) 0%,transparent 70%); pointer-events:none; }
+.header-label { font-size:10px; letter-spacing:.25em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; }
+.header h1 { font-family:'Shippori Mincho',serif; font-size:26px; font-weight:800; line-height:1.35; margin-bottom:10px; }
+.header h1 span { color:var(--gold); }
+.header-sub { font-size:12px; color:var(--muted); max-width:580px; line-height:1.75; }
+.header-badges { display:flex; gap:8px; margin-top:18px; flex-wrap:wrap; }
+.badge { font-size:10px; letter-spacing:.08em; border:1px solid var(--gold-border); background:var(--gold-pale); color:var(--gold2); padding:3px 10px; border-radius:2px; }
+
+/* NAV */
+.nav-wrap { position:sticky; top:0; z-index:100; background:rgba(14,14,14,.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+.nav { display:flex; overflow-x:auto; scrollbar-width:none; max-width:1100px; margin:0 auto; padding:0 24px; }
+.nav::-webkit-scrollbar { display:none; }
+.nav-item { font-size:11px; letter-spacing:.06em; color:var(--muted); padding:13px 16px; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; transition:all .2s; flex-shrink:0; }
+.nav-item:hover { color:var(--white); }
+.nav-item.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+/* MAIN */
+.main { max-width:1100px; margin:0 auto; padding:0 24px 100px; }
+.section { padding:44px 0 0; display:none; }
+.section.active { display:block; }
+.section-head { display:flex; align-items:baseline; gap:12px; margin-bottom:4px; }
+.section-num { font-size:10px; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; }
+.section-title { font-family:'Shippori Mincho',serif; font-size:20px; font-weight:700; }
+.section-desc { font-size:12px; color:var(--muted); margin-bottom:24px; }
+
+/* TIMELINE */
+.timeline { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; margin-bottom:32px; }
+.tl-step { background:var(--card); padding:18px 14px; border:1px solid var(--border); }
+.tl-bar { height:3px; margin-bottom:12px; border-radius:1px; }
+.tl-num { font-size:10px; letter-spacing:.12em; margin-bottom:4px; }
+.tl-time { font-size:10px; color:var(--muted); margin-bottom:6px; }
+.tl-name { font-family:'Shippori Mincho',serif; font-size:13px; font-weight:700; line-height:1.4; margin-bottom:6px; }
+.tl-goal { font-size:11px; color:var(--muted); line-height:1.6; }
+
+/* PHASE */
+.phase-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.phase-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.phase-title-text { font-family:'Shippori Mincho',serif; font-size:16px; font-weight:700; }
+.goal-box { border-left:3px solid; padding:12px 16px; margin-bottom:16px; font-size:12px; line-height:1.75; background:var(--card); }
+.goal-label { font-size:10px; letter-spacing:.12em; margin-bottom:4px; opacity:.7; }
+
+/* SCRIPTS */
+.scripts { display:grid; gap:10px; margin-bottom:20px; }
+.script { background:var(--card); border:1px solid var(--border); overflow:hidden; }
+.script-q { background:var(--card2); padding:10px 14px; font-size:11.5px; font-weight:700; color:var(--gold2); }
+.script-q::before { content:"💬 "; }
+.script-body { padding:12px 14px; font-size:12.5px; line-height:1.85; color:#D0CCBE; }
+.script-note { padding:6px 14px 12px; font-size:11px; color:var(--muted); }
+.script-note::before { content:"▶ "; color:var(--gold); }
+
+/* GRIDS */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.box { background:var(--card); border:1px solid var(--border); padding:16px; }
+.box-label { font-size:10px; letter-spacing:.12em; color:var(--gold); margin-bottom:8px; text-transform:uppercase; }
+.box p, .box ul { font-size:12px; color:#C0BAA8; line-height:1.8; }
+.box ul { padding-left:14px; }
+.box .eg { margin-top:10px; background:var(--card2); padding:10px 12px; font-size:12px; color:var(--gold2); line-height:1.7; border-left:2px solid var(--gold); }
+.box .talk { margin-top:10px; border-left:2px solid var(--gold); padding-left:10px; font-size:12px; color:var(--gold2); line-height:1.7; }
+
+/* TYPE TAGS */
+.type-tag { font-size:10px; font-weight:700; letter-spacing:.08em; padding:2px 8px; display:inline-block; margin-bottom:8px; border-radius:1px; }
+
+/* DEMO */
+.demo-box { background:var(--card); border:1px solid var(--gold-border); padding:22px; margin-bottom:14px; }
+.demo-title { font-family:'Shippori Mincho',serif; font-size:15px; font-weight:700; color:var(--gold); margin-bottom:3px; }
+.demo-sub { font-size:11px; color:var(--muted); margin-bottom:14px; }
+.demo-steps { display:grid; gap:8px; }
+.demo-step { display:flex; align-items:flex-start; gap:12px; font-size:12.5px; color:#C0BAA8; line-height:1.7; }
+.demo-num { width:22px; height:22px; background:var(--gold); color:var(--black); font-size:10px; font-weight:700; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:3px; }
+.demo-step strong { color:var(--gold2); }
+
+/* LADDER */
+.ladder { display:grid; gap:2px; margin-bottom:16px; }
+.l-row { display:grid; grid-template-columns:160px 1fr; border:1px solid var(--border); overflow:hidden; }
+.l-left { background:var(--card2); padding:14px; display:flex; flex-direction:column; justify-content:center; }
+.l-tag { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:4px; }
+.l-name { font-size:13px; font-weight:700; line-height:1.4; }
+.l-right { background:var(--card); padding:14px 18px; font-size:12.5px; color:#C0BAA8; line-height:1.75; }
+.l-right em { color:var(--gold2); font-style:normal; font-weight:700; }
+
+/* TABLE */
+.tbl { width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12.5px; }
+.tbl th { background:var(--card2); padding:11px 14px; text-align:left; font-size:11px; letter-spacing:.07em; color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); }
+.tbl td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top; color:#C0BAA8; line-height:1.7; }
+.tbl tr:hover td { background:var(--card); }
+.tbl .gd { color:var(--gold2); font-weight:700; }
+.tbl .rd { color:#E07060; }
+
+/* FOLLOW */
+.follow { display:grid; gap:2px; margin-bottom:20px; }
+.fw-row { display:grid; grid-template-columns:80px 1fr; border:1px solid var(--border); overflow:hidden; }
+.fw-time { background:var(--card2); padding:14px 8px; font-family:'Shippori Mincho',serif; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--gold); line-height:1.4; }
+.fw-body { background:var(--card); padding:14px 18px; }
+.fw-action { font-size:13px; font-weight:700; margin-bottom:4px; }
+.fw-detail { font-size:12px; color:#999; line-height:1.7; }
+.fw-script { margin-top:8px; font-size:12px; color:var(--gold2); border-left:2px solid var(--gold); padding-left:10px; line-height:1.7; }
+
+/* ALERTS */
+.alert { border:1px solid; padding:13px 16px; margin-bottom:14px; font-size:12.5px; line-height:1.75; }
+.a-warn { border-color:rgba(200,168,75,.4); background:rgba(200,168,75,.07); color:var(--gold2); }
+.a-danger { border-color:rgba(192,57,43,.4); background:rgba(192,57,43,.07); color:#E08070; }
+.a-ok { border-color:rgba(26,180,96,.4); background:rgba(26,180,96,.07); color:#70D8A0; }
+
+@media(max-width:700px){
+  .header{padding:28px 18px 24px;}
+  .header h1{font-size:20px;}
+  .timeline{grid-template-columns:1fr;}
+  .grid2{grid-template-columns:1fr;}
+  .l-row{grid-template-columns:1fr;}
+  .fw-row{grid-template-columns:60px 1fr;}
+  .main{padding:0 14px 80px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">MARIGYM — 面談完全設計書</div>
+  <h1>アフィリエイト反響客を<span>確実に契約</span>に変える<br>60分オンライン面談の完全マニュアル</h1>
+  <div class="header-sub">「なんとなく資料請求」の温度感低い見込み客が、自ら「入りたい」と言うための設計。事前アンケート活用 → 課題深掘り → マッチング体験 → クロージング → フォローまでを完全収録。</div>
+  <div class="header-badges">
+    <span class="badge">オンライン面談 60分</span>
+    <span class="badge">IBJ AWARD 2024・2025 受賞</span>
+    <span class="badge">IBJ加盟 10万人規模</span>
+    <span class="badge">婚トレ × 専属トレーナー365日</span>
+    <span class="badge">月17,050円〜</span>
+  </div>
+</div>
+
+<div class="nav-wrap">
+  <nav class="nav" id="mainnav">
+    <div class="nav-item active" onclick="go('s0',this)">0. 面談前の準備</div>
+    <div class="nav-item" onclick="go('s1',this)">1. アイスブレイク（0-5分）</div>
+    <div class="nav-item" onclick="go('s2',this)">2. 課題深掘り（5-20分）</div>
+    <div class="nav-item" onclick="go('s3',this)">3. マッチング体験（20-35分）</div>
+    <div class="nav-item" onclick="go('s4',this)">4. サービス説明（35-48分）</div>
+    <div class="nav-item" onclick="go('s5',this)">5. クロージング（48-60分）</div>
+    <div class="nav-item" onclick="go('s6',this)">6. 持ち帰り後フォロー</div>
+  </nav>
+</div>
+
+<div class="main">
+
+<!-- ──────── S0 準備 ──────── -->
+<div class="section active" id="s0">
+  <div class="section-head">
+    <span class="section-num">OVERVIEW</span>
+    <span class="section-title">面談前の準備｜事前アンケートの使い方</span>
+  </div>
+  <div class="section-desc">面談は当日に始まらない。アンケートを読んだ時点で「この人への面談設計」が始まっている。</div>
+
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-bar" style="background:var(--phase1)"></div>
+      <div class="tl-num" style="color:var(--phase1)">PHASE 01</div>
+      <div class="tl-time">0〜5分</div>
+      <div class="tl-name">アイスブレイク &amp; 信頼構築</div>
+      <div class="tl-goal">アンケート言及・緊張解除・「この人なら話せる」を5分で作る</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-bar" style="background:var(--phase2)"></div>
+      <div class="tl-num" style="color:var(--phase2)">PHASE 02</div>
+      <div class="tl-time">5〜20分</div>
+      <div class="tl-name">課題の深掘りヒアリング</div>
+      <div class="tl-goal">「このままではまずい」を自分の口で言わせる</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-bar" style="background:var(--phase3)"></div>
+      <div class="tl-num" style="color:var(--phase3)">PHASE 03</div>
+      <div class="tl-time">20〜35分</div>
+      <div class="tl-name">マッチング体験（山場）</div>
+      <div class="tl-goal">実際の会員を一緒に検索。感情を動かし「本当にいるんだ」を体感させる</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-bar" style="background:var(--phase4)"></div>
+      <div class="tl-num" style="color:var(--phase4)">PHASE 04</div>
+      <div class="tl-time">35〜48分</div>
+      <div class="tl-name">サービス説明 &amp; 強み訴求</div>
+      <div class="tl-goal">体感の後に説明する。IBJ実績・婚トレ・コスパを3点に絞る</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-bar" style="background:var(--phase5)"></div>
+      <div class="tl-num" style="color:var(--phase5)">PHASE 05</div>
+      <div class="tl-time">48〜60分</div>
+      <div class="tl-name">クロージング &amp; 次の合意</div>
+      <div class="tl-goal">持ち帰り防止。「今決める理由」を作り、期日を相手の口から引き出す</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <div class="box-label">ITEM 01 — 婚活を始めてどれくらいですか</div>
+      <p>婚活歴が長い＝過去に傷がある・自己流の限界を感じている可能性大。ここをヒアリングの起点にすると課題深掘りが自然に進む。</p>
+      <div class="eg">【1年未満】まだ情報収集フェーズ。危機感の醸成が最優先。<br>【2年以上】疲弊感あり。「正しい方法でやれば変わる」という希望トークが刺さる。</div>
+    </div>
+    <div class="box">
+      <div class="box-label">ITEM 02 — いつまでの結婚が理想ですか</div>
+      <p>理想の時期から逆算して「今動かないと間に合わない」という時間軸の緊迫感を作れる。クロージングの最大の武器になる。</p>
+      <div class="eg">【○年以内】→「今から逆算すると、あと○ヶ月しかないですよね」<br>【特にない】→まず未来ビジョンを言語化させることから始める。</div>
+    </div>
+    <div class="box">
+      <div class="box-label">ITEM 03 — 利用したことのある婚活ツール</div>
+      <p>過去の失敗経験は最大の共感ポイント。「なぜうまくいかなかったか」の原因を一緒に分析することで、マリジムとの差別化が自然に生まれる。</p>
+      <div class="eg">【アプリ経験あり】「アプリの限界＝自己流の限界」という構図を作る。<br>【相談所経験あり】「前の相談所で何が足りなかったか」を掘り、不満を顕在化させる。</div>
+    </div>
+    <div class="box">
+      <div class="box-label">ITEM 04（任意）— 婚活診断タイプ</div>
+      <p>最重要情報。診断タイプに合わせてトーンと刺さるフレームを変える。</p>
+      <div class="eg">【行動派】スピード・即効性を前面に。<br>【慎重派】データ・実績で安心させてからクロージング。<br>【計画派】ロードマップを一緒に作る構造が刺さる。<br>【調整派】「一人で悩まなくていい」サポートの文脈が最も響く。</div>
+    </div>
+  </div>
+  <div class="alert a-warn">⚠️ 面談30分前までにアンケートを再読し、「この人への3つの質問」を手元にメモしておくこと。ぶっつけ本番でヒアリングしない。</div>
+</div>
+
+<!-- ──────── S1 アイスブレイク ──────── -->
+<div class="section" id="s1">
+  <div class="section-head">
+    <span class="section-num" style="color:var(--phase1)">PHASE 01</span>
+    <span class="section-title">アイスブレイク &amp; 信頼構築（0〜5分）</span>
+  </div>
+  <div class="section-desc">オンライン面談の最初5分が契約率を決める。「画面越しの初対面」のハードルを最速で下げる。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--phase1)"></div>
+    <div class="phase-title-text">このフェーズの唯一の目的</div>
+  </div>
+  <div class="goal-box" style="border-color:var(--phase1)">
+    <div class="goal-label" style="color:var(--phase1)">GOAL</div>
+    「話してよかった」という感情を5分で作ること。サービス説明は1ミリもしない。
+  </div>
+
+  <div class="scripts">
+    <div class="script">
+      <div class="script-q">開始直後：接続確認 + 場を温める</div>
+      <div class="script-body">「○○さん、本日はお時間いただきありがとうございます！画面・音声は大丈夫ですか？」<br>「今日はお仕事終わりですか？お疲れのところ時間を作っていただいて、うれしいです。」</div>
+      <div class="script-note">疲れの有無を確認するだけで「この人は私のことを気にしてくれている」という印象が生まれる。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">アンケートへの感謝 + 共感で即信頼を作る（必ず使う）</div>
+      <div class="script-body">「事前にアンケートをご記入いただいてありがとうございます。拝見して、○○さんが○年間ずっと真剣に婚活してこられたんだなと感じました。それだけ頑張ってきたのに、まだ結果が出ていない、それは本当につらいですよね。」</div>
+      <div class="script-note">アンケートを「読んでいた」という事実だけで、他社との差別化になる。絶対に使う。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">今日の時間のフレーミング（主導権を握る）</div>
+      <div class="script-body">「今日は60分で、○○さんの婚活の状況をしっかり聞かせてもらって、マリジムが本当にお役に立てるかどうかを一緒に確認したいと思っています。サービスを無理に売りたいわけじゃなくて、○○さんに合う方法を一緒に考えたいんです。何でも正直に話してください。」</div>
+      <div class="script-note">「売り込まない」宣言がその後の本音ヒアリングを引き出す。慎重派・調整派に特に効く。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── S2 ヒアリング ──────── -->
+<div class="section" id="s2">
+  <div class="section-head">
+    <span class="section-num" style="color:var(--phase2)">PHASE 02</span>
+    <span class="section-title">課題の深掘りヒアリング（5〜20分）</span>
+  </div>
+  <div class="section-desc">温度感が低い客の「入りたい」は説明では作れない。自分の口から「このままではまずい」を言わせることで初めて生まれる。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--phase2)"></div>
+    <div class="phase-title-text">ヒアリングの基本構造：現状 → 理想 → ギャップ → 感情</div>
+  </div>
+  <div class="goal-box" style="border-color:var(--phase2)">
+    <div class="goal-label" style="color:var(--phase2)">GOAL</div>
+    お客様が「このままではいけない」と自分で気づく状態を作る。担当者が言うのではなく、お客様自身が言う言葉だけが人を動かす。
+  </div>
+  <div class="alert a-ok">✅ アンケートの回答は「すでに知っている情報」として使う。「教えてください」ではなく「○○とのことでしたが、もう少し聞かせてもらえますか？」という形で深掘りする。</div>
+
+  <div class="scripts">
+    <div class="script">
+      <div class="script-q">STEP 1：現状確認（過去の婚活を掘る）</div>
+      <div class="script-body">「アンケートでアプリを使ってこられたとのことで、具体的にどんな感じでしたか？マッチングはできていましたか？」<br>（答えを受けて）「なるほど。マッチングはできるけど、そこから会うのが大変、または会っても続かない、という感じですか？」</div>
+      <div class="script-note">YesかNoかで答えられる質問から始め、徐々に「なぜ」へ深掘りしていく。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">STEP 2：理想を聞く（感情的な未来を描かせる）</div>
+      <div class="script-body">「○○さんが描いている、理想の結婚生活ってどんなイメージですか？」<br>（答えを受けて）「いいですね。例えば、平日の夜に一緒にごはんを食べたり、休日に出かけるパートナーがいる生活、ということですよね？」</div>
+      <div class="script-note">具体的な日常シーンに落とし込む。「結婚したい」という抽象的な言葉を、感情が動くビジョンに変換する。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">STEP 3：ギャップと感情を言語化させる（核心）</div>
+      <div class="script-body">「今の状況と、その理想の生活、かなりギャップありますよね。そのギャップに対して、正直どう感じていますか？」<br>（感情が出てきたら）「アンケートで○年以内の結婚が理想と書いてくださっていましたが、今のペースでいくと、間に合いそうですか？」</div>
+      <div class="script-note">「間に合いそうですか？」は非常に強い言葉。お客様自身に「このままでは無理かも」を言わせる質問。ここまでの共感の文脈を作ってから使う。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">STEP 4：過去の失敗を分析させる（差別化の種を作る）</div>
+      <div class="script-body">「これまで○年間頑張ってこられて、なぜうまくいかなかったと思いますか？自分なりの分析ってありますか？」<br>（答えを受けて）「そうですよね。〇〇（相手の言葉）が原因だと感じてらっしゃるんですね。それ、自己流でやっている限り、どうしてもそこで詰まるんですよ。」</div>
+      <div class="script-note">自己分析を引き出した後、「自己流の限界」というフレームで受け止めることで、プロサポートの必要性が自然に浮かび上がる。</div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div class="phase-header">
+      <div class="phase-dot" style="background:var(--gold)"></div>
+      <div class="phase-title-text">診断タイプ別：刺さるヒアリングの切り口</div>
+    </div>
+    <div class="grid2">
+      <div class="box">
+        <span class="type-tag" style="background:rgba(200,168,75,.15);color:var(--gold2)">行動派</span>
+        <p>スピードと成果に関心が高い。「行動量は十分なのに結果が出ないのはなぜか」という問いが刺さる。</p>
+        <div class="talk">「○○さんの行動力はすごくある。でも、方向性が少しズレているだけで結果が出ないことって、婚活ではよくあるんです。」</div>
+      </div>
+      <div class="box">
+        <span class="type-tag" style="background:rgba(75,142,200,.15);color:#7AB8E8">慎重派</span>
+        <p>失敗を恐れるため決断が遅い。まず「安心できる根拠」を積み上げることが最優先。感情よりデータで動く。</p>
+        <div class="talk">「マリジムがどんな実績があるか、ちゃんとお見せします。それを見てから判断していただければ大丈夫ですよ。」</div>
+      </div>
+      <div class="box">
+        <span class="type-tag" style="background:rgba(75,200,122,.15);color:#7AE8A8">計画派</span>
+        <p>「どうなるか」のロードマップが見えないと動けない。一緒に「婚活のプラン」を作る感覚が刺さる。</p>
+        <div class="talk">「○○さんの希望時期から逆算して、どう動くのが最短ルートか、今日一緒に考えてみましょう。」</div>
+      </div>
+      <div class="box">
+        <span class="type-tag" style="background:rgba(155,75,200,.15);color:#C87AE8">調整派</span>
+        <p>一人で決めることを苦手としている。「一緒に考えてもらえる」という安心感が最大の動機になる。</p>
+        <div class="talk">「一人で婚活って、本当に孤独ですよね。マリジムは専属トレーナーが365日いるので、何があってもすぐ相談できます。」</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── S3 マッチング体験 ──────── -->
+<div class="section" id="s3">
+  <div class="section-head">
+    <span class="section-num" style="color:var(--phase3)">PHASE 03</span>
+    <span class="section-title">マッチング体験（20〜35分）｜面談の山場</span>
+  </div>
+  <div class="section-desc">ここが最大の差別化ポイント。「説明する」のではなく「体感させる」。感情が動いた瞬間が契約の決め手になる。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--phase3)"></div>
+    <div class="phase-title-text">なぜマッチング体験が最強のクロージングツールか</div>
+  </div>
+  <div class="goal-box" style="border-color:var(--phase3)">
+    <div class="goal-label" style="color:var(--phase3)">原則</div>
+    人は「説明されたこと」より「自分が体験したこと」で決断する。10万人の会員データを実際に見せることで「本当にこういう人がいるんだ」という実感が生まれ、入会への心理的ハードルが一気に下がる。
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">マッチング体験の進め方（画面共有前提）</div>
+    <div class="demo-sub">※事前にIBJシステムを開いておく。「一緒に探す」スタンスで進める。</div>
+    <div class="demo-steps">
+      <div class="demo-step"><div class="demo-num">1</div><div>「ちょっと、実際に今活動している会員さんを一緒に見てみましょうか。どんな方がいるか、リアルに確認できますよ。」<strong>→ 画面共有スタート</strong></div></div>
+      <div class="demo-step"><div class="demo-num">2</div><div>先ほどヒアリングした条件を入力する。<strong>「○○さんが理想とおっしゃっていた年齢帯・職業で絞ってみますね」</strong>と実況しながら進める。</div></div>
+      <div class="demo-step"><div class="demo-num">3</div><div>検索結果が出たら一緒に見る。<strong>「この方、どう思いますか？プロフィールも見てみましょうか。」</strong>と感想を引き出す。</div></div>
+      <div class="demo-step"><div class="demo-num">4</div><div>お客様の反応を拾う。興味が出たら<strong>「この方、今日入会していただければ来週にはお申し込みできますよ。」</strong>と具体的に伝える。</div></div>
+      <div class="demo-step"><div class="demo-num">5</div><div>終了時：<strong>「どうでしたか？思ってたより、理想に近い方、いましたよね？」</strong>と感想を確認して次フェーズへ。</div></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <div class="box-label">体験中に使うフレーズ</div>
+      <ul>
+        <li>「マッチングアプリでは絶対に出てこないタイプの方ですよね」</li>
+        <li>「全員、身元確認・独身証明済みなので安心ですよ」</li>
+        <li>「今10万人いるので、○○さんの条件でこれだけ候補が出ます」</li>
+        <li>「入会翌日から申し込めるのがマリジムの強みです」</li>
+      </ul>
+    </div>
+    <div class="box">
+      <div class="box-label">体験でやってはいけないこと</div>
+      <ul>
+        <li>❌ 担当者だけが画面を見て説明する（体験ではなく説明になる）</li>
+        <li>❌ 条件を聞かずに適当な候補を見せる</li>
+        <li>❌ 「どうですか？」を繰り返して圧をかける</li>
+        <li>❌ 体験に15分以上使う（インパクトを出したら即次フェーズへ）</li>
+      </ul>
+    </div>
+  </div>
+  <div class="alert a-warn">⚡ 体験中に「この人いいな」「思ってたより良い人いますね」という言葉が出た瞬間が最大のクロージングチャンス。その感情が冷める前に次のフェーズへ移行する。</div>
+</div>
+
+<!-- ──────── S4 説明 ──────── -->
+<div class="section" id="s4">
+  <div class="section-head">
+    <span class="section-num" style="color:var(--phase4)">PHASE 04</span>
+    <span class="section-title">サービス説明 &amp; 強み訴求（35〜48分）</span>
+  </div>
+  <div class="section-desc">体感で感情が動いた「後」に説明する。この順番が重要。説明は短く、刺さる3点に絞る。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--phase4)"></div>
+    <div class="phase-title-text">マリジムの強みを「刺さる順番」で伝える</div>
+  </div>
+  <div class="goal-box" style="border-color:var(--phase4)">
+    <div class="goal-label" style="color:var(--phase4)">原則</div>
+    全部説明しようとしない。「あなたの課題に合う理由」だけを選んで伝える。ヒアリングで出た悩みに直接対応する形で話す。
+  </div>
+
+  <div class="scripts">
+    <div class="script">
+      <div class="script-q">強み① マッチング体験で確認済みの10万人規模</div>
+      <div class="script-body">「さっき一緒に見ていただいたように、IBJ加盟で10万人の中から探せます。しかも全員、身元確認・独身証明済み。マッチングアプリと決定的に違うのはここです。」</div>
+      <div class="script-note">体験と直接リンクさせることで「説明」ではなく「確認」になる。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">強み② 婚トレ × 専属トレーナー（自己流との差別化）</div>
+      <div class="script-body">「マリジムが他の相談所と一番違うのが、入会して終わりじゃないこと。専属のトレーナーが365日、婚活の戦略から会話の練習まで一緒に考えてくれます。これが"婚トレ"です。○○さんが今まで自己流でうまくいかなかった部分、ここで変わります。」</div>
+      <div class="script-note">「自己流の限界」というフェーズ2で作った文脈に直接つなげる。</div>
+    </div>
+    <div class="script">
+      <div class="script-q">強み③ 実績 + コスパ（比較検討客を納得させる）</div>
+      <div class="script-body">「IBJ AWARD 2024・2025、連続受賞しています。全体の上位10〜15%の相談所にしか与えられない賞です。それで月々17,050円から。大手相談所の半額以下で、同じIBJの10万人にアクセスできます。」</div>
+      <div class="script-note">数字で話す。「安い」ではなく「実績があって、なおかつリーズナブル」という表現にする。</div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <div class="phase-header">
+      <div class="phase-dot" style="background:var(--gold)"></div>
+      <div class="phase-title-text">「他社と比較したい」「○○も検討してます」への対応</div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>よくある比較相手</th><th>相手の特徴</th><th>マリジムの切り返し</th></tr></thead>
+      <tbody>
+        <tr><td>マッチングアプリ</td><td class="rd">身元不明・自己流・会えない</td><td class="gd">「今まで使ってきて、結果出ましたか？」→ 体験で見た会員の質と比較させる</td></tr>
+        <tr><td>大手相談所</td><td class="rd">月4〜5万円超・担当者が変わりやすい</td><td class="gd">「同じIBJ10万人に、半額以下でアクセスできます。専属トレーナーも変わりません。」</td></tr>
+        <tr><td>知人紹介の相談所</td><td class="rd">実績・専門性が不透明</td><td class="gd">「IBJ AWARDは全体の10〜15%しか受賞できません。この実績は数字で証明できます。」</td></tr>
+        <tr><td>「もう少し考えたい」</td><td class="rd">実質的な先送り・温度が下がるリスク</td><td class="gd">「もちろんです。一番気になっているのはどこですか？」→ 課題を特定してその場で解消する</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ──────── S5 クロージング ──────── -->
+<div class="section" id="s5">
+  <div class="section-head">
+    <span class="section-num" style="color:var(--phase5)">PHASE 05</span>
+    <span class="section-title">クロージング（48〜60分）｜持ち帰り防止</span>
+  </div>
+  <div class="section-desc">「持ち帰ります」が最大の失注原因。持ち帰りを防ぐのではなく、「今日決める理由」を作ることが正解。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--phase5)"></div>
+    <div class="phase-title-text">クロージング4ステップ</div>
+  </div>
+  <div class="ladder">
+    <div class="l-row">
+      <div class="l-left"><div class="l-tag">STEP 01</div><div class="l-name">全体の感想を確認する</div></div>
+      <div class="l-right">「今日お話しして、率直にどうでしたか？」<br>→ ポジティブな感想が出たら「特に、どの部分が一番刺さりましたか？」と深掘りする。<br>→ <em>相手の言葉で「良かった点」を言語化させることで、自分で入会理由を作ってもらう。</em></div>
+    </div>
+    <div class="l-row">
+      <div class="l-left"><div class="l-tag">STEP 02</div><div class="l-name">決断の障壁を特定する</div></div>
+      <div class="l-right">「マリジムに入会するとしたら、今一番気になっていることってありますか？」<br>→ <em>費用</em>：「月17,050円で、今まで使ってきたアプリの費用と実は大差ないんです」<br>→ <em>時間</em>：「オンライン完結なので移動ゼロ。夜や休日にもトレーナーと話せます」<br>→ <em>迷い</em>：「入会後8日間はクーリングオフが使えるので、まずお試しで始める感覚でも大丈夫です」</div>
+    </div>
+    <div class="l-row">
+      <div class="l-left"><div class="l-tag">STEP 03</div><div class="l-name">時間軸で緊迫感を作る</div></div>
+      <div class="l-right">「○○さん、○年以内の結婚が理想とのことでしたよね。今から逆算すると、動き出せるのは実質あと○ヶ月です。婚活は平均○ヶ月かかると言われていて、今月動き出せるかどうかで結果が大きく変わります。」<br>→ <em>焦らせるのではなく、現実を一緒に計算する感覚で伝える。</em></div>
+    </div>
+    <div class="l-row">
+      <div class="l-left"><div class="l-tag">STEP 04</div><div class="l-name">小さなYESで合意を取る</div></div>
+      <div class="l-right">即決できない場合：「わかりました。では、いつ頃ご判断できそうですか？」<br>→ <em>期日の合意を取る。「○日までに」という言葉を相手の口から引き出す。</em><br><br>即決できる場合：「では、今日お手続きを進めましょうか。15分で完了します。」</div>
+    </div>
+  </div>
+
+  <div class="alert a-danger">❌ 絶対にやってはいけない：「ゆっくり考えてください」「また気が向いたらご連絡を」という言葉。持ち帰りになっても、必ず「期日」を合意してから終わる。</div>
+  <div class="alert a-ok">✅ 持ち帰りになった場合の最後の一言：「もし仮に今日ご入会いただくとしたら、何が一番の決め手になりましたか？」→ 入会理由を言語化させる。これがフォロー時の切り口になる。</div>
+</div>
+
+<!-- ──────── S6 フォロー ──────── -->
+<div class="section" id="s6">
+  <div class="section-head">
+    <span class="section-num">FOLLOW</span>
+    <span class="section-title">持ち帰り後のフォロー設計</span>
+  </div>
+  <div class="section-desc">面談後48時間が勝負。連絡が途絶えるのは、フォローが遅いのではなく「次の接点の理由」がないから。</div>
+
+  <div class="phase-header">
+    <div class="phase-dot" style="background:var(--gold)"></div>
+    <div class="phase-title-text">フォロータイムライン</div>
+  </div>
+  <div class="follow">
+    <div class="fw-row">
+      <div class="fw-time">当日<br>3時間以内</div>
+      <div class="fw-body">
+        <div class="fw-action">感謝メッセージ ＋ 体験で見た候補の共有</div>
+        <div class="fw-detail">売り込みは一切しない。「役に立つ情報を届ける人」として最初の接点を作る。</div>
+        <div class="fw-script">「○○さん、今日はお時間いただきありがとうございました！今日一緒に見た会員さんの中で、私が特に○○さんに合うと思った方を2名ピックアップしました。よかったらまた見てみてください（スクショ添付）。何かあればいつでも連絡ください！」</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-time">翌日</div>
+      <div class="fw-body">
+        <div class="fw-action">価値提供型コンテンツを送る</div>
+        <div class="fw-detail">「婚活に役立つ情報」として送る。セールスではなく、有益な情報提供者として接触する。</div>
+        <div class="fw-script">「昨日のお話でアプリとの違いが気になっているとおっしゃっていたので、参考になるかと思って。IBJ加盟の相談所と大手アプリの成婚率の比較データです。よかったらご参考に。」</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-time">3日後</div>
+      <div class="fw-body">
+        <div class="fw-action">期日の確認 ＋ 最後の障壁を取り除く</div>
+        <div class="fw-detail">面談で合意した「決断の期日」に合わせて確認する。質問形式で圧をかけずに連絡する。</div>
+        <div class="fw-script">「○○さん、先日はありがとうございました。その後いかがですか？もし気になっていることや確認したいことがあればいつでも聞いてください。よかったら15分だけオンラインで話しませんか？」</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-time">1週間後</div>
+      <div class="fw-body">
+        <div class="fw-action">新着会員の共有 ＋ 入会特典の期限を伝える</div>
+        <div class="fw-detail">「情報更新」という理由で接触する。時間的制限を作ることで決断を促す。</div>
+        <div class="fw-script">「○○さん、先日のマッチング体験で気になっていた年齢層の新しい会員さんが入られました。また、今月ご入会いただくと初月の費用が特別価格になります。来月になると変わってしまうので、よかったらご一緒に確認しませんか？」</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-header" style="margin-top:8px;">
+    <div class="phase-dot" style="background:var(--gold)"></div>
+    <div class="phase-title-text">フォローで使ってはいけない言葉 vs 使うべき言葉</div>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>❌ 使ってはいけない</th><th>✅ 使うべき言葉</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td class="rd">「ご検討いただけましたか？」</td><td class="gd">「その後いかがですか？」</td><td>「検討」という言葉が「まだ売り込もうとしている」という印象を与える。</td></tr>
+      <tr><td class="rd">「ぜひご入会を」「お早めに」</td><td class="gd">「気になることがあれば気軽に聞いてください」</td><td>「相談しやすい人」として残ることが長期的な成約につながる。</td></tr>
+      <tr><td class="rd">毎日連絡する</td><td class="gd">理由のある連絡を3〜4回だけ</td><td>理由なき連絡はブロックリスクを高める。新着情報・有益情報という「理由」を必ず作る。</td></tr>
+    </tbody>
+  </table>
+  <div class="alert a-warn">⚡ フォローのゴールは「思い出してもらうこと」ではなく「決断する理由を届けること」。毎回のフォローに、相手の決断を後押しする「情報」か「きっかけ」を必ず添える。</div>
+</div>
+
+</div>
+
+<script>
+function go(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
